@@ -6,10 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start"
-        android:onClick="startStockTracing"/>
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/http_get_btn"
+            android:text="@string/http_get"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
