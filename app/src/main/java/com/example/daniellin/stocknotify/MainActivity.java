@@ -18,8 +18,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     Http_Get HG;
 
-    static Handler handler; //宣告成static讓service可以直接使用
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,20 +29,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //讓多個Button共用一個Listener，在Listener中再去設定各按鈕要做的事
         getBtn.setOnClickListener(this);
-
-        //接收service傳出Post的到的回傳訊息，並透過Toast顯示出來
-        handler = new Handler(){
-            public void handleMessage(Message msg){
-                switch (msg.what){
-                    case 123:
-                        String ss = (String)msg.obj;
-                        Toast.makeText(MainActivity.this, ss.length(),Toast.LENGTH_LONG).show();
-                        break;
-                        default:
-                            break;
-                }
-            }
-        };
     }
 
 
