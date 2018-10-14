@@ -3,6 +3,7 @@ package com.example.daniellin.stocknotify;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 
 import org.apache.http.HttpEntity;
@@ -28,10 +29,89 @@ import java.util.ArrayList;
 public class Http_Get extends Service {
 
     private String getUrl;
-
     private ArrayList<LocalTime> preTimestampTemp;
+    private ArrayList<Double> buyPriceArr;
+    private ArrayList<Double> sellPriceArr;
+    private ArrayList<Double> dealPriceArr;
+    //private ArrayList<Double> dealPriceArr;
+
+    private void calculateMean(int minute) {
+        LocalTime localTimeTemp;
+        double d_temp, latestMean=this.dealPriceArr.get(0);
+        int count;
+
+        for (int i = this.preTimestampTemp.size()-1;i >= 0;i--) {
+            localTimeTemp = preTimestampTemp.get(i).minusMinutes(minute);
+            //Log.i("123",localTimeTemp.toString());
+            d_temp=0;
+            count=0;
+            for(int j=i;j <= this.preTimestampTemp.size() - 1;j++) {
+                if(localTimeTemp.isBefore(preTimestampTemp.get(j))) {
+                    d_temp += this.dealPriceArr.get(j);
+                    count++;
+                    //Log.i("123",preTimestampTemp.get(j).toString());
+                }
+                else {
+                    break;
+                }
+            }
+            if (count > 0) {
+                if (i==0) {
+                    sentToMainActivity(R.integer.sentToMain,localTimeTemp.toString()+" "+String.valueOf(d_temp / count)+" 1");
+                }
+                else {
+                    sentToMainActivity(R.integer.sentToMain,localTimeTemp.toString()+" "+String.valueOf(d_temp / count)+" 0");
+                }
+
+                //Log.i("123",localTimeTemp.toString());
+                //Log.i("123",String.valueOf(d_temp / count));
+                //Log.i("123",String.valueOf(count));
+
+            }
+        }
+    }
+
+    private void analyzeData() {
+        //calculateMean(1);
+        calculateMean(5);
+    }
+
+    private void sentToMainActivity (int number, String ss) {
+
+        Message msg = Message.obtain();
+        //設定Message的內容
+        msg.what = number;
+        msg.obj = ss;
+        //使用MainActivity的static handler來丟Message
+        MainActivity.handler.sendMessage(msg);
+    }
 
     private void processOneLine(String inputString) {
+        int i_temp=0;
+
+        if (inputString.indexOf('.',i_temp) > -1) {
+            //Log.i("123",inputString.substring(inputString.indexOf('.',0)-2,
+                    //inputString.indexOf('.',0)+3));
+            if(inputString.indexOf("<!--價量明細 結束-->") < 0) {
+                this.buyPriceArr.add(Double.valueOf(inputString.substring(inputString.indexOf('.',i_temp)-2,
+                        inputString.indexOf('.',i_temp)+3)));
+                i_temp = inputString.indexOf('.',i_temp) + 1;
+                this.sellPriceArr.add(Double.valueOf(inputString.substring(inputString.indexOf('.',i_temp)-2,
+                        inputString.indexOf('.',i_temp)+3)));
+                i_temp = inputString.indexOf('.',i_temp) + 1;
+                this.dealPriceArr.add(Double.valueOf(inputString.substring(inputString.indexOf('.',i_temp)-2,
+                        inputString.indexOf('.',i_temp)+3)));
+            }
+            else {
+                this.dealPriceArr.add(Double.valueOf(inputString.substring(inputString.indexOf('.',i_temp)-2,
+                        inputString.indexOf('.',i_temp)+3)));
+            }
+
+
+        }
+        //Log.i("123",inputString);
+
+
 
     }
 
@@ -43,6 +123,9 @@ public class Http_Get extends Service {
         int i_temp;
 
         this.preTimestampTemp = new ArrayList<>();
+        this.buyPriceArr = new ArrayList<>();
+        this.sellPriceArr = new ArrayList<>();
+        this.dealPriceArr = new ArrayList<>();
 
         while ((line = reader.readLine()) != null) {
             if(line.compareTo("<!--價量明細 開始-->") == 0) {
@@ -65,25 +148,36 @@ public class Http_Get extends Service {
             for (int i=0;i<6;i++) {
                 c_temp = (char)reader.read();
                 //line = line.concat(String.valueOf(c_temp));
-                if (i==2 && c_temp == ':') {
+
+
+                //Log.i("123", String.valueOf(c_temp));
+
+                if (i==2 && c_temp == ':' ) {
                     rightLine = true;
                     this.preTimestampTemp.add(LocalTime.now());
                     //Log.i("wangshu", String.valueOf(this.timestampTemp.getHour()));
-                }else {
+                } else if(i==2 && line.indexOf("<!--價量明細 結束-->") > 0) {
+                    rightLine = true;
+                }
+                else {
                     line = line.concat(String.valueOf(c_temp));
                 }
+
             }
+
             if (rightLine) {
                 //Log.i("wangshu", line.substring(line.length()-9,line.length()-1));
-                i_temp = Integer.parseInt(line.substring(line.length()-7,line.length()-5));
-                this.preTimestampTemp.set(this.preTimestampTemp.size()-1,
-                        this.preTimestampTemp.get(this.preTimestampTemp.size()-1).withHour(i_temp));
-                i_temp = Integer.parseInt(line.substring(line.length()-5,line.length()-3));
-                this.preTimestampTemp.set(this.preTimestampTemp.size()-1,
-                        this.preTimestampTemp.get(this.preTimestampTemp.size()-1).withMinute(i_temp));
-                i_temp = Integer.parseInt(line.substring(line.length()-3,line.length()-1));
-                this.preTimestampTemp.set(this.preTimestampTemp.size()-1,
-                        this.preTimestampTemp.get(this.preTimestampTemp.size()-1).withSecond(i_temp));
+                if (line.indexOf("<!--價量明細 結束-->") < 0) {
+                    i_temp = Integer.parseInt(line.substring(line.length()-7,line.length()-5));
+                    this.preTimestampTemp.set(this.preTimestampTemp.size()-1,
+                            this.preTimestampTemp.get(this.preTimestampTemp.size()-1).withHour(i_temp));
+                    i_temp = Integer.parseInt(line.substring(line.length()-5,line.length()-3));
+                    this.preTimestampTemp.set(this.preTimestampTemp.size()-1,
+                            this.preTimestampTemp.get(this.preTimestampTemp.size()-1).withMinute(i_temp));
+                    i_temp = Integer.parseInt(line.substring(line.length()-3,line.length()-1));
+                    this.preTimestampTemp.set(this.preTimestampTemp.size()-1,
+                            this.preTimestampTemp.get(this.preTimestampTemp.size()-1).withSecond(i_temp));
+                }
                 processOneLine(line);
                 //Log.i("wangshu", line);
             }
@@ -92,9 +186,20 @@ public class Http_Get extends Service {
                 break;
             }
         }
+
+        /*
         for(int i=0;i<this.preTimestampTemp.size();i++) {
             Log.i("wangshu", this.preTimestampTemp.get(i).toString());
         }
+        */
+        //Log.i("wangshu", String.valueOf(this.preTimestampTemp.size()));
+        //Log.i("buy", String.valueOf(this.buyPriceArr.size()));
+        //Log.i("sell", String.valueOf(this.sellPriceArr.size()));
+        //Log.i("deal", String.valueOf(this.dealPriceArr.size()));
+        //Log.i("wangshu", String.valueOf(this.preTimestampTemp.get(749).toString()));
+        //Log.i("wangshu", String.valueOf(this.preTimestampTemp.get(748).toString()));
+        //Log.i("wangshu", String.valueOf(this.buyPriceArr.size()));
+
 
     }
 
@@ -143,6 +248,8 @@ public class Http_Get extends Service {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
+                analyzeData();
+
             }
         }).start();
     }
