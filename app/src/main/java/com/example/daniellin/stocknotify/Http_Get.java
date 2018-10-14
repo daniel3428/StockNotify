@@ -33,7 +33,8 @@ public class Http_Get extends Service {
     private ArrayList<Double> buyPriceArr;
     private ArrayList<Double> sellPriceArr;
     private ArrayList<Double> dealPriceArr;
-    //private ArrayList<Double> dealPriceArr;
+    private ArrayList<Double> dealMeanPriceArr;
+    private ArrayList<Integer> dealQuantityArr;
 
     private void calculateMean(int minute) {
         LocalTime localTimeTemp;
@@ -56,6 +57,7 @@ public class Http_Get extends Service {
                 }
             }
             if (count > 0) {
+                this.dealMeanPriceArr.add(d_temp / count);
                 if (i==0) {
                     sentToMainActivity(R.integer.sentToMain,localTimeTemp.toString()+" "+String.valueOf(d_temp / count)+" 1");
                 }
@@ -87,29 +89,79 @@ public class Http_Get extends Service {
     }
 
     private void processOneLine(String inputString) {
-        int i_temp=0;
+        int i_temp=0, priceDigit=1,quantityDigit=1;
 
         if (inputString.indexOf('.',i_temp) > -1) {
             //Log.i("123",inputString.substring(inputString.indexOf('.',0)-2,
                     //inputString.indexOf('.',0)+3));
+            for (int i=1;i<=4;i++) {
+                if(inputString.charAt(inputString.indexOf('.',i_temp)-i) <= '9' &&
+                        inputString.charAt(inputString.indexOf('.',i_temp)-i) >= '0') {
+                    priceDigit = i;
+                }
+                else {
+                    break;
+                }
+            }
             if(inputString.indexOf("<!--價量明細 結束-->") < 0) {
-                this.buyPriceArr.add(Double.valueOf(inputString.substring(inputString.indexOf('.',i_temp)-2,
+
+                this.buyPriceArr.add(Double.valueOf(inputString.substring(inputString.indexOf('.',i_temp)-priceDigit,
                         inputString.indexOf('.',i_temp)+3)));
                 i_temp = inputString.indexOf('.',i_temp) + 1;
-                this.sellPriceArr.add(Double.valueOf(inputString.substring(inputString.indexOf('.',i_temp)-2,
+                this.sellPriceArr.add(Double.valueOf(inputString.substring(inputString.indexOf('.',i_temp)-priceDigit,
                         inputString.indexOf('.',i_temp)+3)));
                 i_temp = inputString.indexOf('.',i_temp) + 1;
-                this.dealPriceArr.add(Double.valueOf(inputString.substring(inputString.indexOf('.',i_temp)-2,
+                this.dealPriceArr.add(Double.valueOf(inputString.substring(inputString.indexOf('.',i_temp)-priceDigit,
                         inputString.indexOf('.',i_temp)+3)));
             }
             else {
-                this.dealPriceArr.add(Double.valueOf(inputString.substring(inputString.indexOf('.',i_temp)-2,
+                this.dealPriceArr.add(Double.valueOf(inputString.substring(inputString.indexOf('.',i_temp)-priceDigit,
                         inputString.indexOf('.',i_temp)+3)));
+                i_temp = inputString.indexOf("</td><td>",i_temp) + 1;
+                //i_temp = inputString.indexOf('.',i_temp) + 1;
             }
-
-
+            //Log.i("123",inputString.substring(inputString.indexOf("</td><td>",i_temp)));
+            for (int i=0;i<3;i++) {
+                i_temp = inputString.indexOf("</td><td>",i_temp) + 1;
+            }
+            //Log.i("123",String.valueOf(this.dealPriceArr.size()));
+            //Log.i("123",inputString.substring(inputString.indexOf("</td><td>",i_temp)-8,
+                    //inputString.indexOf("</td><td>",i_temp)-5));
+            if (inputString.charAt(inputString.indexOf("</td><td>",i_temp)-1) <= '9' &&
+                    inputString.charAt(inputString.indexOf("</td><td>",i_temp)-1) >= '0') {
+                for (int i=1;i<=4;i++) {
+                    if(inputString.charAt(inputString.indexOf("</td><td>",i_temp)-i) <= '9' &&
+                            inputString.charAt(inputString.indexOf("</td><td>",i_temp)-i) >= '0') {
+                        quantityDigit = i;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                this.dealQuantityArr.add(Integer.valueOf(inputString.substring(inputString.indexOf("</td><td>",i_temp)-quantityDigit,
+                        inputString.indexOf("</td><td>",i_temp))));
+                //Log.i("123",inputString.substring(inputString.indexOf("</td><td>",i_temp)-quantityDigit,
+                        //inputString.indexOf("</td><td>",i_temp)));
+            }
+            else {
+                for (int i=1;i<=4;i++) {
+                    //Log.i("123",inputString.substring(inputString.indexOf("</td><td>",i_temp)-7-i));
+                    if(inputString.charAt(inputString.indexOf("</td><td>",i_temp)-7-i) <= '9' &&
+                            inputString.charAt(inputString.indexOf("</td><td>",i_temp)-7-i) >= '0') {
+                        quantityDigit = i;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                this.dealQuantityArr.add(Integer.valueOf(inputString.substring(inputString.indexOf("</td><td>",i_temp)-7-quantityDigit,
+                        inputString.indexOf("</td><td>",i_temp)-7)));
+                //Log.i("123",inputString.substring(inputString.indexOf("</td><td>",i_temp)-7-quantityDigit,
+                        //inputString.indexOf("</td><td>",i_temp)-7));
+            }
+            //Log.i("123",String.valueOf(dealQuantityArr.get(dealQuantityArr.size()-1)));
         }
-        //Log.i("123",inputString);
+
 
 
 
@@ -126,6 +178,8 @@ public class Http_Get extends Service {
         this.buyPriceArr = new ArrayList<>();
         this.sellPriceArr = new ArrayList<>();
         this.dealPriceArr = new ArrayList<>();
+        this.dealMeanPriceArr = new ArrayList<>();
+        this.dealQuantityArr = new ArrayList<>();
 
         while ((line = reader.readLine()) != null) {
             if(line.compareTo("<!--價量明細 開始-->") == 0) {
@@ -196,6 +250,7 @@ public class Http_Get extends Service {
         //Log.i("buy", String.valueOf(this.buyPriceArr.size()));
         //Log.i("sell", String.valueOf(this.sellPriceArr.size()));
         //Log.i("deal", String.valueOf(this.dealPriceArr.size()));
+
         //Log.i("wangshu", String.valueOf(this.preTimestampTemp.get(749).toString()));
         //Log.i("wangshu", String.valueOf(this.preTimestampTemp.get(748).toString()));
         //Log.i("wangshu", String.valueOf(this.buyPriceArr.size()));
@@ -249,6 +304,11 @@ public class Http_Get extends Service {
                     e.printStackTrace();
                 }
                 analyzeData();
+
+                //Log.i("wangshu", String.valueOf(dealMeanPriceArr.size()));
+                //Log.i("wangshu", String.valueOf(dealPriceArr.size()));
+                //Log.i("Q", String.valueOf(dealQuantityArr.size()));
+
 
             }
         }).start();
