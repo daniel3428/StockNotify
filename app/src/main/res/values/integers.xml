@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="sentToMain">345</integer>
+    <integer name="receiveBuy">345</integer>
+    <integer name="receiveSell">345</integer>
 </resources>

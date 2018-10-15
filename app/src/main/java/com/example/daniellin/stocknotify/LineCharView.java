@@ -61,6 +61,10 @@ public class LineCharView {
         for(int i=0; i<list_Date.size(); i++){
             if(i==0) {
                 multiRenderer.addXTextLabel(list_Date.get(i), "9");
+                multiRenderer.addXTextLabel(list_Date.get(i)/9*10, "10");
+                multiRenderer.addXTextLabel(list_Date.get(i)/9*11, "11");
+                multiRenderer.addXTextLabel(list_Date.get(i)/9*12, "12");
+                multiRenderer.addXTextLabel(list_Date.get(i)/9*13, "13");
             }
             /*if (list_Date.get(i).) {
                 multiRenderer.addXTextLabel(i+1, "" + list_Date.get(i).toString());

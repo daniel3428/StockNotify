@@ -6,5 +6,9 @@
 
     <string name="help_txt">請輸入要Post的內容</string>
     <string name="txt_message_hint">請輸入文字</string>
-    <string name="http_get">Http Get</string>
+    <string name="http_get">Get</string>
+    <string name="stock_2327">國巨</string>
+    <string name="stock_2492">華新科</string>
+    <string name="stock_3406">玉晶光</string>
+    <string name="stock_6552">易華電</string>
 </resources>

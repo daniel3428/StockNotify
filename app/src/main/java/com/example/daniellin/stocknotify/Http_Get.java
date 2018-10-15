@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class Http_Get extends Service {
 
@@ -33,49 +35,104 @@ public class Http_Get extends Service {
     private ArrayList<Double> buyPriceArr;
     private ArrayList<Double> sellPriceArr;
     private ArrayList<Double> dealPriceArr;
-    private ArrayList<Double> dealMeanPriceArr;
+    private ArrayList<Double> dealMeanPriceArr_1;
+    private ArrayList<Double> dealMeanPriceArr_3;
+    private ArrayList<Double> dealMeanPriceArr_5;
     private ArrayList<Integer> dealQuantityArr;
+    private int renewIndex;
+
+    /*--------------------------------------------------------------------------------------------*/
+
+    /*--------------------------------------------------------------------------------------------*/
 
     private void calculateMean(int minute) {
         LocalTime localTimeTemp;
-        double d_temp, latestMean=this.dealPriceArr.get(0);
+        double d_temp;
         int count;
+
+        //Log.i("123",String.valueOf(this.dealQuantityArr.size()));
 
         for (int i = this.preTimestampTemp.size()-1;i >= 0;i--) {
             localTimeTemp = preTimestampTemp.get(i).minusMinutes(minute);
             //Log.i("123",localTimeTemp.toString());
             d_temp=0;
             count=0;
+            //Log.i("123",this.dealQuantityArr.get(i).toString());
+            //Log.i("123",this.dealPriceArr.get(i).toString());
             for(int j=i;j <= this.preTimestampTemp.size() - 1;j++) {
                 if(localTimeTemp.isBefore(preTimestampTemp.get(j))) {
+                    //d_temp += this.dealPriceArr.get(j)*this.dealQuantityArr.get(j);
+                    //count += this.dealQuantityArr.get(j);
                     d_temp += this.dealPriceArr.get(j);
                     count++;
-                    //Log.i("123",preTimestampTemp.get(j).toString());
+                    //Log.i("123",String.valueOf(dealPriceArr.get(j)));
+                    //Log.i("123",String.valueOf(dealQuantityArr.get(j)));
                 }
                 else {
                     break;
                 }
             }
             if (count > 0) {
-                this.dealMeanPriceArr.add(d_temp / count);
-                if (i==0) {
-                    sentToMainActivity(R.integer.sentToMain,localTimeTemp.toString()+" "+String.valueOf(d_temp / count)+" 1");
-                }
-                else {
-                    sentToMainActivity(R.integer.sentToMain,localTimeTemp.toString()+" "+String.valueOf(d_temp / count)+" 0");
+                switch (minute) {
+                    case 1:
+                        this.dealMeanPriceArr_1.add(d_temp / count);
+                        //Log.i("123",String.valueOf(preTimestampTemp.get(i)));
+                        //Log.i("123",String.valueOf(dealMeanPriceArr_1.get(i)));
+                        break;
+                    case 3:
+                        this.dealMeanPriceArr_3.add(d_temp / count);
+                        break;
+                    case 5:
+                        this.dealMeanPriceArr_5.add(d_temp / count);
+                        break;
+                        default:
+                            break;
                 }
 
-                //Log.i("123",localTimeTemp.toString());
-                //Log.i("123",String.valueOf(d_temp / count));
-                //Log.i("123",String.valueOf(count));
+                //Log.i("123",dealMeanPriceArr_1.get(i).toString());
+
+                if(minute ==5) {
+                    if (i==0 ) {
+                        sentToMainActivity(R.integer.sentToMain,localTimeTemp.toString()+" "+String.valueOf(d_temp / count)+" 1");
+                    }
+                    else {
+                        sentToMainActivity(R.integer.sentToMain,localTimeTemp.toString()+" "+String.valueOf(d_temp / count)+" 0");
+                    }
+
+                }
+
 
             }
         }
+        switch (minute) {
+            case 1:
+                Collections.reverse(this.dealMeanPriceArr_1);
+                break;
+            case 3:
+                Collections.reverse(this.dealMeanPriceArr_3);
+                break;
+            case 5:
+                Collections.reverse(this.dealMeanPriceArr_5);
+                break;
+            default:
+                break;
+        }
+        //Log.i("123",String.valueOf(dealMeanPriceArr_1.size()));
+        /*if(minute==1){
+        for (int i =0;i<preTimestampTemp.size();i++) {
+            Log.i("123",String.valueOf(preTimestampTemp.get(i)));
+            Log.i("123",String.valueOf(dealMeanPriceArr_1.get(i)));
+            Log.i("123",String.valueOf(dealQuantityArr.get(i)));
+        }
+        }*/
     }
 
     private void analyzeData() {
         //calculateMean(1);
+        calculateMean(1);
+        calculateMean(3);
         calculateMean(5);
+        predictTrend();
     }
 
     private void sentToMainActivity (int number, String ss) {
@@ -140,8 +197,6 @@ public class Http_Get extends Service {
                 }
                 this.dealQuantityArr.add(Integer.valueOf(inputString.substring(inputString.indexOf("</td><td>",i_temp)-quantityDigit,
                         inputString.indexOf("</td><td>",i_temp))));
-                //Log.i("123",inputString.substring(inputString.indexOf("</td><td>",i_temp)-quantityDigit,
-                        //inputString.indexOf("</td><td>",i_temp)));
             }
             else {
                 for (int i=1;i<=4;i++) {
@@ -178,7 +233,9 @@ public class Http_Get extends Service {
         this.buyPriceArr = new ArrayList<>();
         this.sellPriceArr = new ArrayList<>();
         this.dealPriceArr = new ArrayList<>();
-        this.dealMeanPriceArr = new ArrayList<>();
+        this.dealMeanPriceArr_1 = new ArrayList<>();
+        this.dealMeanPriceArr_3 = new ArrayList<>();
+        this.dealMeanPriceArr_5 = new ArrayList<>();
         this.dealQuantityArr = new ArrayList<>();
 
         while ((line = reader.readLine()) != null) {
@@ -259,6 +316,7 @@ public class Http_Get extends Service {
     }
 
     public void Get(String url){
+        this.renewIndex=0;
         this.getUrl = url;
 
         new Thread(new Runnable() {
