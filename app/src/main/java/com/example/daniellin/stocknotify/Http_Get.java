@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 
 import org.apache.http.HttpEntity;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,7 +41,9 @@ public class Http_Get extends Service {
     private ArrayList<Double> dealMeanPriceArr_3;
     private ArrayList<Double> dealMeanPriceArr_5;
     private ArrayList<Integer> dealQuantityArr;
+    private ArrayList<Integer> upDownArr;
     private int renewIndex;
+    private int recentNumber;
 
     /*--------------------------------------------------------------------------------------------*/
 
@@ -91,6 +95,7 @@ public class Http_Get extends Service {
 
                 //Log.i("123",dealMeanPriceArr_1.get(i).toString());
 
+                /*
                 if(minute ==5) {
                     if (i==0 ) {
                         sentToMainActivity(R.integer.sentToMain,localTimeTemp.toString()+" "+String.valueOf(d_temp / count)+" 1");
@@ -100,6 +105,7 @@ public class Http_Get extends Service {
                     }
 
                 }
+                */
 
 
             }
@@ -197,6 +203,7 @@ public class Http_Get extends Service {
                 }
                 this.dealQuantityArr.add(Integer.valueOf(inputString.substring(inputString.indexOf("</td><td>",i_temp)-quantityDigit,
                         inputString.indexOf("</td><td>",i_temp))));
+
             }
             else {
                 for (int i=1;i<=4;i++) {
@@ -211,6 +218,17 @@ public class Http_Get extends Service {
                 }
                 this.dealQuantityArr.add(Integer.valueOf(inputString.substring(inputString.indexOf("</td><td>",i_temp)-7-quantityDigit,
                         inputString.indexOf("</td><td>",i_temp)-7)));
+                if(inputString.charAt(inputString.indexOf("</td><td>",i_temp)-7-quantityDigit-7)== 'e') {
+                    //Log.i("123",String.valueOf(inputString.charAt(inputString.indexOf("</td><td>",i_temp)-7-quantityDigit-7)));
+                    upDownArr.add(1);
+                }
+                else if(inputString.charAt(inputString.indexOf("</td><td>",i_temp)-7-quantityDigit-7)== '3'){
+                    //Log.i("123",String.valueOf(inputString.charAt(inputString.indexOf("</td><td>",i_temp)-7-quantityDigit-7)));
+                    upDownArr.add(-1);
+                }
+                else {
+                    upDownArr.add(0);
+                }
                 //Log.i("123",inputString.substring(inputString.indexOf("</td><td>",i_temp)-7-quantityDigit,
                         //inputString.indexOf("</td><td>",i_temp)-7));
             }
@@ -237,6 +255,7 @@ public class Http_Get extends Service {
         this.dealMeanPriceArr_3 = new ArrayList<>();
         this.dealMeanPriceArr_5 = new ArrayList<>();
         this.dealQuantityArr = new ArrayList<>();
+        this.upDownArr = new ArrayList<>();
 
         while ((line = reader.readLine()) != null) {
             if(line.compareTo("<!--價量明細 開始-->") == 0) {
@@ -315,14 +334,16 @@ public class Http_Get extends Service {
 
     }
 
-    public void Get(String url){
+    public void Get(String url,Integer r_number){
         this.renewIndex=0;
+        this.recentNumber=r_number;
         this.getUrl = url;
 
         new Thread(new Runnable() {
 
             @Override
             public void run() {
+
                 HttpParams mDefaultHttpParams = new BasicHttpParams();
                 //设置连接超时
                 HttpConnectionParams.setConnectionTimeout(mDefaultHttpParams, 15000);

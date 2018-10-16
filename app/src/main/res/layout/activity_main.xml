@@ -42,11 +42,26 @@
 
         </LinearLayout>
 
-        <EditText
-            android:id="@+id/stock_number"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:saveEnabled="false"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/stock_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:saveEnabled="false"/>
+            <TextView
+                android:id="@+id/text_view_show_up_down"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:id="@+id/recent_number_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5"
+                android:saveEnabled="false"/>
+        </LinearLayout>
+
         <LinearLayout
             android:id="@+id/chart_container"
             android:layout_width="match_parent"

@@ -1,5 +1,15 @@
 package com.example.daniellin.stocknotify;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.SystemClock;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,10 +22,16 @@ import android.widget.Toast;
 import android.os.Handler;
 import android.os.Message;
 
+
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import static android.media.RingtoneManager.getDefaultUri;
 import static com.example.daniellin.stocknotify.LineCharView.ChartView;
 
 
@@ -34,6 +50,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Http_Get HG;
 
     static Handler handler; //宣告成static讓service可以直接使用
+
+    private void setNotification(String time,int buySell) {
+        Intent intent= new Intent();
+        intent.setClass(this, MainActivity.class);
+        //intent.setAction(MyService.ACTION1);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP
+                //| Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationManager manager = (NotificationManager)
+                getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(getApplicationContext());
+        builder.setSmallIcon(R.drawable.pika)
+                .setWhen(System.currentTimeMillis())
+                .setContentText(time)
+                .setContentIntent(pendingIntent)
+                //.setChannelId("2")
+                .setContentInfo("3");
+        if(buySell==1) {
+            builder.setContentTitle("Buy");
+        }
+        else {
+            builder.setContentTitle("Sell");
+        }
+        //builder.addAction(111,"ACTION1",pendingIntent);
+        builder.setVibrate(new long[] { 1000, 3000, 1000});
+        Notification notification = builder.build();
+
+        manager.notify((int)(Math.random()*55446), notification);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +105,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button_2492.setOnClickListener(this);
         button_3406.setOnClickListener(this);
         button_6552.setOnClickListener(this);
+
+
 
         handler = new Handler() {
             public void handleMessage(Message msg) {
@@ -85,12 +134,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         TextView textViewBuy = findViewById(R.id.showTextBuy);
                         textViewBuy.setTextColor(android.graphics.Color.RED);
                         textViewBuy.append(ss_buy+"\n");
+                        String[] time_buy = ss_buy.split(":");
+                        if(LocalTime.of(Integer.valueOf(time_buy[0]),Integer.valueOf(time_buy[1]),Integer.valueOf(time_buy[2]))
+                                .isAfter(LocalTime.now().minusMinutes(3))) {
+                            setNotification(ss_buy,1);
+                        }
+
+
+
                         break;
                     case R.integer.receiveSell:
                         String ss_sell = (String)msg.obj;
                         TextView textViewSell = findViewById(R.id.showTextSell);
                         textViewSell.setTextColor(android.graphics.Color.GREEN);
                         textViewSell.append(ss_sell+"\n");
+                        String[] time_sell = ss_sell.split(":");
+                        if(LocalTime.of(Integer.valueOf(time_sell[0]),Integer.valueOf(time_sell[1]),Integer.valueOf(time_sell[2]))
+                                .isAfter(LocalTime.now().minusMinutes(3))) {
+                            setNotification(ss_sell, -1);
+                        }
+                        break;
+                    case R.integer.receiveUpDown:
+                        String ss_up_down = (String)msg.obj;
+                        String[] ss_up_down_split = ss_up_down.split(" ");
+                        if(ss_up_down_split[0].compareTo(String.valueOf(0))!=0) {
+                            TextView textViewUpDown=findViewById(R.id.text_view_show_up_down);
+
+                            textViewUpDown.setText(ss_up_down_split[0]+"."+ss_up_down_split[1]);
+                            if(Integer.valueOf(ss_up_down_split[0])>=50)
+                                textViewUpDown.setTextColor(android.graphics.Color.RED);
+                            else
+                                textViewUpDown.setTextColor(android.graphics.Color.GREEN);
+                        }
                         break;
                 }
             }
@@ -102,21 +177,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v){
         switch (v.getId()){
             case R.id.http_get_btn:
-                TextView textViewSell = findViewById(R.id.showTextSell);
-                textViewSell.setText("");
-                TextView textViewBuy = findViewById(R.id.showTextBuy);
-                textViewBuy.setText("");
-                this.timeArr=new ArrayList<>();
-                this.priceArr=new ArrayList<>();
-                EditText editTextStockNumber = findViewById(R.id.stock_number);
-                String targetURL = getUrl.concat(editTextStockNumber.getText().toString()+".html");
-                //getUrl=getUrl.concat(editTextStockNumber.getText().toString()+".html");
-                HG.Get(targetURL);
+                //setNotification();
+                //while(true) {
+                //setNotification(String.valueOf("123"), -1);
+                for(int i=0;i<10000;i++) {
+
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                    TextView textViewSell = findViewById(R.id.showTextSell);
+                    textViewSell.setText("");
+                    TextView textViewBuy = findViewById(R.id.showTextBuy);
+                    textViewBuy.setText("");
+                    timeArr = new ArrayList<>();
+                    priceArr = new ArrayList<>();
+                    EditText editTextStockNumber = findViewById(R.id.stock_number);
+                    String targetURL = getUrl.concat(editTextStockNumber.getText().toString() + ".html");
+                    EditText editTextRecentNumber = findViewById(R.id.recent_number_edit);
+                    //getUrl=getUrl.concat(editTextStockNumber.getText().toString()+".html");
+                    HG.Get(targetURL,Integer.valueOf(editTextRecentNumber.getText().toString()));
+                    }
+                }, 10000*i);
+
+
+
+                }
                 break;
             case R.id.stock_2327_b:
                 EditText editTextStockNumber_2327 = findViewById(R.id.stock_number);
                 editTextStockNumber_2327.setText(String.valueOf(2327));
-                Log.i("123","123");
+                //Log.i("123","123");
                 break;
             case R.id.stock_2492_b:
                 EditText editTextStockNumber_2492 = findViewById(R.id.stock_number);

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="sentToMain">345</integer>
-    <integer name="receiveBuy">345</integer>
-    <integer name="receiveSell">345</integer>
+    <integer name="receiveBuy">346</integer>
+    <integer name="receiveSell">347</integer>
+    <integer name="receiveUpDown">248</integer>
 </resources>
