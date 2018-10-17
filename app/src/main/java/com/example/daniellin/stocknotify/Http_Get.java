@@ -42,8 +42,11 @@ public class Http_Get extends Service {
     private ArrayList<Double> dealMeanPriceArr_5;
     private ArrayList<Integer> dealQuantityArr;
     private ArrayList<Integer> upDownArr;
+    private ArrayList<Integer> recentBigBuyNumArr;
+    private ArrayList<Integer> recentBigSellNumArr;
     private int renewIndex;
     private int recentNumber;
+    private int bigNumber;
 
     /*--------------------------------------------------------------------------------------------*/
 
@@ -57,14 +60,17 @@ public class Http_Get extends Service {
         //Log.i("123",String.valueOf(this.dealQuantityArr.size()));
 
         for (int i = this.preTimestampTemp.size()-1;i >= 0;i--) {
-            localTimeTemp = preTimestampTemp.get(i).minusMinutes(minute);
+            localTimeTemp = this.preTimestampTemp.get(i).minusMinutes(minute);
+
             //Log.i("123",localTimeTemp.toString());
             d_temp=0;
             count=0;
             //Log.i("123",this.dealQuantityArr.get(i).toString());
             //Log.i("123",this.dealPriceArr.get(i).toString());
             for(int j=i;j <= this.preTimestampTemp.size() - 1;j++) {
-                if(localTimeTemp.isBefore(preTimestampTemp.get(j))) {
+                //Log.i("123",localTimeTemp.toString());
+                //Log.i("321",this.preTimestampTemp.get(j).toString());
+                if(localTimeTemp.isBefore(this.preTimestampTemp.get(j))) {
                     //d_temp += this.dealPriceArr.get(j)*this.dealQuantityArr.get(j);
                     //count += this.dealQuantityArr.get(j);
                     d_temp += this.dealPriceArr.get(j);
@@ -76,11 +82,13 @@ public class Http_Get extends Service {
                     break;
                 }
             }
+            //Log.i("123",String.valueOf(count));
+            //Log.i("123",localTimeTemp.toString());
             if (count > 0) {
                 switch (minute) {
                     case 1:
                         this.dealMeanPriceArr_1.add(d_temp / count);
-                        //Log.i("123",String.valueOf(preTimestampTemp.get(i)));
+                        //Log.i("123",String.valueOf(d_temp / count));
                         //Log.i("123",String.valueOf(dealMeanPriceArr_1.get(i)));
                         break;
                     case 3:
@@ -138,7 +146,6 @@ public class Http_Get extends Service {
         calculateMean(1);
         calculateMean(3);
         calculateMean(5);
-        predictTrend();
     }
 
     private void sentToMainActivity (int number, String ss) {
@@ -233,6 +240,7 @@ public class Http_Get extends Service {
                         //inputString.indexOf("</td><td>",i_temp)-7));
             }
             //Log.i("123",String.valueOf(dealQuantityArr.get(dealQuantityArr.size()-1)));
+            //Log.i("123",String.valueOf(dealPriceArr.get(dealPriceArr.size()-1)));
         }
 
 
@@ -256,6 +264,8 @@ public class Http_Get extends Service {
         this.dealMeanPriceArr_5 = new ArrayList<>();
         this.dealQuantityArr = new ArrayList<>();
         this.upDownArr = new ArrayList<>();
+        this.recentBigBuyNumArr = new ArrayList<>();
+        this.recentBigSellNumArr = new ArrayList<>();
 
         while ((line = reader.readLine()) != null) {
             if(line.compareTo("<!--價量明細 開始-->") == 0) {
@@ -334,9 +344,10 @@ public class Http_Get extends Service {
 
     }
 
-    public void Get(String url,Integer r_number){
+    public void Get(String url,Integer b_number){
         this.renewIndex=0;
-        this.recentNumber=r_number;
+        this.recentNumber=200;
+        this.bigNumber=b_number;
         this.getUrl = url;
 
         new Thread(new Runnable() {
@@ -383,6 +394,8 @@ public class Http_Get extends Service {
                     e.printStackTrace();
                 }
                 analyzeData();
+
+                predictTrend();
 
                 //Log.i("wangshu", String.valueOf(dealMeanPriceArr.size()));
                 //Log.i("wangshu", String.valueOf(dealPriceArr.size()));

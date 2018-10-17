@@ -55,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <EditText
-                android:id="@+id/recent_number_edit"
+                android:id="@+id/big_number_edit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="5"
