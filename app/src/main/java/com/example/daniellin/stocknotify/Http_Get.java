@@ -97,8 +97,8 @@ public class Http_Get extends Service {
                     case 5:
                         this.dealMeanPriceArr_5.add(d_temp / count);
                         break;
-                        default:
-                            break;
+                    default:
+                        break;
                 }
 
                 //Log.i("123",dealMeanPriceArr_1.get(i).toString());
@@ -163,7 +163,7 @@ public class Http_Get extends Service {
 
         if (inputString.indexOf('.',i_temp) > -1) {
             //Log.i("123",inputString.substring(inputString.indexOf('.',0)-2,
-                    //inputString.indexOf('.',0)+3));
+            //inputString.indexOf('.',0)+3));
             for (int i=1;i<=4;i++) {
                 if(inputString.charAt(inputString.indexOf('.',i_temp)-i) <= '9' &&
                         inputString.charAt(inputString.indexOf('.',i_temp)-i) >= '0') {
@@ -196,7 +196,7 @@ public class Http_Get extends Service {
             }
             //Log.i("123",String.valueOf(this.dealPriceArr.size()));
             //Log.i("123",inputString.substring(inputString.indexOf("</td><td>",i_temp)-8,
-                    //inputString.indexOf("</td><td>",i_temp)-5));
+            //inputString.indexOf("</td><td>",i_temp)-5));
             if (inputString.charAt(inputString.indexOf("</td><td>",i_temp)-1) <= '9' &&
                     inputString.charAt(inputString.indexOf("</td><td>",i_temp)-1) >= '0') {
                 for (int i=1;i<=4;i++) {
@@ -237,7 +237,7 @@ public class Http_Get extends Service {
                     upDownArr.add(0);
                 }
                 //Log.i("123",inputString.substring(inputString.indexOf("</td><td>",i_temp)-7-quantityDigit,
-                        //inputString.indexOf("</td><td>",i_temp)-7));
+                //inputString.indexOf("</td><td>",i_temp)-7));
             }
             //Log.i("123",String.valueOf(dealQuantityArr.get(dealQuantityArr.size()-1)));
             //Log.i("123",String.valueOf(dealPriceArr.get(dealPriceArr.size()-1)));

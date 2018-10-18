@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.setClass(this, MainActivity.class);
         //intent.setAction(MyService.ACTION1);
         //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP
-                //| Intent.FLAG_ACTIVITY_NEW_TASK);
+        //| Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationManager manager = (NotificationManager)
@@ -160,11 +160,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         TextView textViewUpDown=findViewById(R.id.text_view_show_up_down);
 
                         textViewUpDown.setText(ss_up_down_split[0]+"/"+String.valueOf(Integer.valueOf(ss_up_down_split[0])+Integer.valueOf(ss_up_down_split[1])));
-                            /*if(Double.valueOf(ss_up_down_split[0])/(Double.valueOf(ss_up_down_split[0])+Double.valueOf(ss_up_down_split[1]))>0.5)
+                        if(Integer.valueOf(ss_up_down_split[0])+Integer.valueOf(ss_up_down_split[1])>0){
+                            textViewUpDown.append(" = "+String.valueOf(Double.valueOf(ss_up_down_split[0])/(Double.valueOf(ss_up_down_split[0])+Double.valueOf(ss_up_down_split[1])))
+                                    .substring(0,7));
+                            if(Integer.valueOf(ss_up_down_split[0])>Integer.valueOf(ss_up_down_split[1])) {
                                 textViewUpDown.setTextColor(android.graphics.Color.RED);
-                            else
-                                textViewUpDown.setTextColor(android.graphics.Color.GREEN);*/
+                            }
+                            else {
+                                textViewUpDown.setTextColor(android.graphics.Color.GREEN);
+                            }
+                        }
+                        else {
 
+                        }
                         break;
                 }
             }
@@ -183,26 +191,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 //final int test_index;
 //test_index=i;
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                    TextView textViewSell = findViewById(R.id.showTextSell);
-                    textViewSell.setText("");
-                    TextView textViewBuy = findViewById(R.id.showTextBuy);
-                    textViewBuy.setText("");
-                    TextView textViewUpDown = findViewById(R.id.text_view_show_up_down);
-                    textViewUpDown.setText("");
-                    timeArr = new ArrayList<>();
-                    priceArr = new ArrayList<>();
-                    EditText editTextStockNumber = findViewById(R.id.stock_number);
-                    String targetURL = getUrl.concat(editTextStockNumber.getText().toString() + ".html");
-                    EditText editTextRecentNumber = findViewById(R.id.big_number_edit);
-                    //getUrl=getUrl.concat(editTextStockNumber.getText().toString()+".html");
-                    //HG.Get(targetURL,Integer.valueOf(editTextRecentNumber.getText().toString()),Integer.valueOf(test_index));
-                    HG.Get(targetURL,Integer.valueOf(editTextRecentNumber.getText().toString()));
-                    }
-                }, 10000*i);
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            TextView textViewSell = findViewById(R.id.showTextSell);
+                            textViewSell.setText("");
+                            TextView textViewBuy = findViewById(R.id.showTextBuy);
+                            textViewBuy.setText("");
+                            TextView textViewUpDown = findViewById(R.id.text_view_show_up_down);
+                            textViewUpDown.setText("");
+                            timeArr = new ArrayList<>();
+                            priceArr = new ArrayList<>();
+                            EditText editTextStockNumber = findViewById(R.id.stock_number);
+                            String targetURL = getUrl.concat(editTextStockNumber.getText().toString() + ".html");
+                            EditText editTextRecentNumber = findViewById(R.id.big_number_edit);
+                            //getUrl=getUrl.concat(editTextStockNumber.getText().toString()+".html");
+                            //HG.Get(targetURL,Integer.valueOf(editTextRecentNumber.getText().toString()),Integer.valueOf(test_index));
+                            HG.Get(targetURL,Integer.valueOf(editTextRecentNumber.getText().toString()));
+                        }
+                    }, 10000*i);
 
 
 
@@ -225,8 +233,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 EditText editTextStockNumber_6552 = findViewById(R.id.stock_number);
                 editTextStockNumber_6552.setText(String.valueOf(6552));
                 break;
-                default:
-                    break;
+            default:
+                break;
         }
     }
 
