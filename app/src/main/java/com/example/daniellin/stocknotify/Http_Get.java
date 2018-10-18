@@ -47,6 +47,7 @@ public class Http_Get extends Service {
     private int renewIndex;
     private int recentNumber;
     private int bigNumber;
+    private int endIndex;
 
     /*--------------------------------------------------------------------------------------------*/
 
@@ -344,11 +345,12 @@ public class Http_Get extends Service {
 
     }
 
-    public void Get(String url,Integer b_number){
+    public void Get(String url,Integer b_number,Integer e_index){
         this.renewIndex=0;
         this.recentNumber=200;
         this.bigNumber=b_number;
         this.getUrl = url;
+        this.endIndex=e_index;
 
         new Thread(new Runnable() {
 
@@ -375,6 +377,7 @@ public class Http_Get extends Service {
                 get.addHeader("Accept", "text/html");
                 get.addHeader("Accept-Language", "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7");
                 get.addHeader("Referer", "http://pchome.megatime.com.tw/stock/sto0/ock3/sid6552.html");
+                get.addHeader("Cache-Control", "max-age=0");
 
                 try {
                     HttpResponse mHttpResponse = httpClient.execute(get);

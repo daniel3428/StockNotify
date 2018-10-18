@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.os.Message;
 
 
+import java.text.DecimalFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -161,8 +162,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         textViewUpDown.setText(ss_up_down_split[0]+"/"+String.valueOf(Integer.valueOf(ss_up_down_split[0])+Integer.valueOf(ss_up_down_split[1])));
                         if(Integer.valueOf(ss_up_down_split[0])+Integer.valueOf(ss_up_down_split[1])>0){
-                            textViewUpDown.append(" = "+String.valueOf(Double.valueOf(ss_up_down_split[0])/(Double.valueOf(ss_up_down_split[0])+Double.valueOf(ss_up_down_split[1])))
-                                    .substring(0,7));
+                            //Log.i("123",String.valueOf(Double.valueOf(ss_up_down_split[0])/(Double.valueOf(ss_up_down_split[0])+Double.valueOf(ss_up_down_split[1]))));
+                            double dd = Double.valueOf(ss_up_down_split[0])/(Double.valueOf(ss_up_down_split[0])+Double.valueOf(ss_up_down_split[1]))*100;
+                            DecimalFormat df = new DecimalFormat("##.##");
+                            textViewUpDown.append(" = "+String.valueOf(df.format(dd))+"%");
                             if(Integer.valueOf(ss_up_down_split[0])>Integer.valueOf(ss_up_down_split[1])) {
                                 textViewUpDown.setTextColor(android.graphics.Color.RED);
                             }
@@ -189,8 +192,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //setNotification(String.valueOf("123"), -1);
                 for(int i=0;i<10000;i++) {
 
-//final int test_index;
-//test_index=i;
+final int test_index;
+test_index=i;
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         @Override
@@ -208,12 +211,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             EditText editTextRecentNumber = findViewById(R.id.big_number_edit);
                             //getUrl=getUrl.concat(editTextStockNumber.getText().toString()+".html");
                             //HG.Get(targetURL,Integer.valueOf(editTextRecentNumber.getText().toString()),Integer.valueOf(test_index));
-                            HG.Get(targetURL,Integer.valueOf(editTextRecentNumber.getText().toString()));
+                            HG.Get(targetURL,Integer.valueOf(editTextRecentNumber.getText().toString()),test_index);
                         }
                     }, 10000*i);
-
-
-
                 }
                 break;
             case R.id.stock_2327_b:
