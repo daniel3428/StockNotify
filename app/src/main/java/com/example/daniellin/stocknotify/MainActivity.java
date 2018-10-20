@@ -12,6 +12,7 @@ import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -177,6 +178,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         }
                         break;
+                    case R.integer.receiveDeal:
+                        String ss_deal = (String)msg.obj;
+                        TextView textViewDeal = findViewById(R.id.showTextDeal);
+                        //textViewSell.setTextColor(android.graphics.Color.GREEN);
+                        //textViewSell.append(ss_sell+"\n");
+                        String[] string_arr_deal = ss_deal.split(" ");
+                        if(string_arr_deal[3].compareTo("1")==0){
+                            textViewDeal.append(Html.fromHtml(string_arr_deal[0]+" "+string_arr_deal[1]+" "+"<font color=\"#FF0000\">"+string_arr_deal[2]+"<\font>"+"<br>"));
+                        }
+                        else {
+                            textViewDeal.append(Html.fromHtml(string_arr_deal[0]+" "+string_arr_deal[1]+" "+"<font color=\"#00FF00\">"+string_arr_deal[2]+"<\font>"+"<br>"));
+                        }
+
+                        break;
                 }
             }
         };
@@ -204,6 +219,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             textViewBuy.setText("");
                             TextView textViewUpDown = findViewById(R.id.text_view_show_up_down);
                             textViewUpDown.setText("");
+                            TextView textViewDeal = findViewById(R.id.showTextDeal);
+                            textViewDeal.setText("");
                             timeArr = new ArrayList<>();
                             priceArr = new ArrayList<>();
                             EditText editTextStockNumber = findViewById(R.id.stock_number);
