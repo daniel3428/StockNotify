@@ -243,10 +243,6 @@ public class Http_Get extends Service {
             //Log.i("123",String.valueOf(dealQuantityArr.get(dealQuantityArr.size()-1)));
             //Log.i("123",String.valueOf(dealPriceArr.get(dealPriceArr.size()-1)));
         }
-
-
-
-
     }
 
     private void converStreamToString(InputStream is) throws IOException {
@@ -341,8 +337,6 @@ public class Http_Get extends Service {
         //Log.i("wangshu", String.valueOf(this.preTimestampTemp.get(749).toString()));
         //Log.i("wangshu", String.valueOf(this.preTimestampTemp.get(748).toString()));
         //Log.i("wangshu", String.valueOf(this.buyPriceArr.size()));
-
-
     }
 
     public void Get(String url,Integer b_number,Integer e_index){

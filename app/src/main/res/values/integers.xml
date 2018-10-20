@@ -4,4 +4,5 @@
     <integer name="receiveBuy">346</integer>
     <integer name="receiveSell">347</integer>
     <integer name="receiveUpDown">248</integer>
+    <integer name="receiveDeal">291</integer>
 </resources>
