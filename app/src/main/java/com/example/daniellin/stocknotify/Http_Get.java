@@ -7,6 +7,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -42,8 +43,8 @@ public class Http_Get extends Service {
     private ArrayList<Double> dealMeanPriceArr_5;
     private ArrayList<Integer> dealQuantityArr;
     private ArrayList<Integer> upDownArr;
-    private ArrayList<Integer> recentBigBuyNumArr;
-    private ArrayList<Integer> recentBigSellNumArr;
+    private ArrayList<Integer> totalBigNumArr;
+    private ArrayList<Integer> totalSmallNumArr;
     private int renewIndex;
     private int recentNumber;
     private int bigNumber;
@@ -251,6 +252,7 @@ public class Http_Get extends Service {
         char c_temp;
         boolean rightLine;
         int i_temp;
+        int totalNum=0,totalBigBuyNum=0,totalBigSellNum=0,totalSmallBuyNum=0,totalSmallSellNum=0;
 
         this.preTimestampTemp = new ArrayList<>();
         this.buyPriceArr = new ArrayList<>();
@@ -261,10 +263,11 @@ public class Http_Get extends Service {
         this.dealMeanPriceArr_5 = new ArrayList<>();
         this.dealQuantityArr = new ArrayList<>();
         this.upDownArr = new ArrayList<>();
-        this.recentBigBuyNumArr = new ArrayList<>();
-        this.recentBigSellNumArr = new ArrayList<>();
+        this.totalBigNumArr = new ArrayList<>();
+        this.totalSmallNumArr = new ArrayList<>();
 
         while ((line = reader.readLine()) != null) {
+            //Log.i("123",line);
             if(line.compareTo("<!--價量明細 開始-->") == 0) {
                 break;
             }
@@ -324,11 +327,51 @@ public class Http_Get extends Service {
             }
         }
 
+
+        this.totalSmallNumArr.add(0);
+        this.totalBigNumArr.add(0);
+
+        for(int i=this.preTimestampTemp.size()-2;i>=0;i--) {
+            totalNum=totalNum+this.dealQuantityArr.get(i);
+            if(this.dealQuantityArr.get(i)>=this.bigNumber) {
+                this.totalSmallNumArr.add(this.totalSmallNumArr.get(this.totalSmallNumArr.size()-1));
+
+                if(this.upDownArr.get(i)==1) {
+                    totalBigBuyNum = totalBigBuyNum + this.dealQuantityArr.get(i);
+                }
+                else if (this.upDownArr.get(i)==-1) {
+                    totalBigSellNum = totalBigSellNum + this.dealQuantityArr.get(i);
+                }
+                this.totalBigNumArr.add(totalBigBuyNum-totalBigSellNum);
+            }
+            else {
+                this.totalBigNumArr.add(this.totalBigNumArr.get(this.totalBigNumArr.size()-1));
+
+                if(this.upDownArr.get(i)==1) {
+                    totalSmallBuyNum = totalSmallBuyNum + this.dealQuantityArr.get(i);
+                }
+                else if (this.upDownArr.get(i)==-1) {
+                    totalSmallSellNum = totalSmallSellNum + this.dealQuantityArr.get(i);
+                }
+                this.totalSmallNumArr.add(totalSmallBuyNum-totalSmallSellNum);
+            }
+            if(i==0) {
+                sentToMainActivity(R.integer.receiveBig, this.preTimestampTemp.get(i).toString() + " " + this.totalBigNumArr.get(this.preTimestampTemp.size() - i - 1).toString()+" 1");
+                sentToMainActivity(R.integer.receiveSmall, this.preTimestampTemp.get(i).toString() + " " + this.totalSmallNumArr.get(this.preTimestampTemp.size() - i - 1).toString()+" 1");
+            }
+            else {
+                sentToMainActivity(R.integer.receiveBig, this.preTimestampTemp.get(i).toString() + " " + this.totalBigNumArr.get(this.preTimestampTemp.size() - i - 1).toString()+" 0");
+                sentToMainActivity(R.integer.receiveSmall, this.preTimestampTemp.get(i).toString() + " " + this.totalSmallNumArr.get(this.preTimestampTemp.size() - i - 1).toString()+" 0");
+            }
+        }
+        Collections.reverse(this.totalBigNumArr);
         /*
         for(int i=0;i<this.preTimestampTemp.size();i++) {
-            Log.i("wangshu", this.preTimestampTemp.get(i).toString());
+            Log.i("123",this.totalBigNumArr.get(i).toString());
+            Log.i("321",this.preTimestampTemp.get(i).toString());
         }
         */
+
         //Log.i("wangshu", String.valueOf(this.preTimestampTemp.size()));
         //Log.i("buy", String.valueOf(this.buyPriceArr.size()));
         //Log.i("sell", String.valueOf(this.sellPriceArr.size()));
@@ -371,16 +414,21 @@ public class Http_Get extends Service {
                 get.addHeader("Accept", "text/html");
                 get.addHeader("Accept-Language", "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7");
                 get.addHeader("Referer", "http://pchome.megatime.com.tw/stock/sto0/ock3/sid6552.html");
+                get.addHeader("If-Modified-Since", "2018-10-01 13:19:00");
                 get.addHeader("Cache-Control", "max-age=0");
+                //get.addHeader("If-None-Match", "x234dff");
 
                 try {
                     HttpResponse mHttpResponse = httpClient.execute(get);
                     HttpEntity mHttpEntity = mHttpResponse.getEntity();
                     int code = mHttpResponse.getStatusLine().getStatusCode();
+                    //Header[] sss = mHttpResponse.getAllHeaders();
+                    //for(int i=0;i< sss.length;i++)
+                    //Log.i("wangshu", sss[i].toString());
                     if (null != mHttpEntity) {
                         InputStream mInputStream = mHttpEntity.getContent();
                         converStreamToString(mInputStream);
-                        //Log.i("wangshu", "請求狀態碼:" + code + "\n請求結果:\n" + respose);
+                        //Log.i("wangshu", "請求狀態碼:" + code );
                         mInputStream.close();
                     }
                 } catch (ClientProtocolException e) {

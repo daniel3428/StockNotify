@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/http_get_btn"
+                android:text="@string/http_get"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/stock_2327_b"
+                android:text="@string/stock_2327"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/stock_2492_b"
+                android:text="@string/stock_2492"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/stock_3406_b"
+                android:text="@string/stock_3406"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/stock_6552_b"
+                android:text="@string/stock_6552"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/stock_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:saveEnabled="false"/>
+            <TextView
+                android:id="@+id/text_view_show_up_down"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:id="@+id/big_number_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5"
+                android:saveEnabled="false"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/chart_container"
+            android:layout_width="match_parent"
+            android:layout_height="180dip"
+            android:orientation="vertical"
+            android:layout_margin="8dip" >
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/showTextBuy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"/>
+            <TextView
+                android:id="@+id/showTextSell"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"/>
+            <TextView
+                android:id="@+id/showTextDeal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

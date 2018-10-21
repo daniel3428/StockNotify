@@ -10,10 +10,12 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,10 +50,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button button_6552;
     private List<Double> timeArr;
     private List<Double> priceArr;
+    private List<Double> bigDealArr;
+    private List<Double> smallDealArr;
+    private View v2;
 
     Http_Get HG;
 
     static Handler handler; //宣告成static讓service可以直接使用
+
+    ViewPager pager;
+    ArrayList<View> pagerList;
 
     private void setNotification(String time,int buySell) {
         Intent intent= new Intent();
@@ -89,24 +97,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        pager = findViewById(R.id.pager);
+        LayoutInflater li = getLayoutInflater().from(this);
+        View v1 = li.inflate(R.layout.initial_layout,null);
+        v2 = li.inflate(R.layout.show_quantity,null);
+        pagerList = new ArrayList<View>();
+        pagerList.add(v1);
+        pagerList.add(v2);
+        pager.setAdapter(new MyViewPagerAdapter(pagerList));
+        pager.setCurrentItem(0);
 
 
 
 
         HG = new Http_Get();
-        getBtn = (Button) findViewById(R.id.http_get_btn);
-        button_2327 = (Button) findViewById(R.id.stock_2327_b);
-        button_2492 = (Button) findViewById(R.id.stock_2492_b);
-        button_3406 = (Button) findViewById(R.id.stock_3406_b);
-        button_6552 = (Button) findViewById(R.id.stock_6552_b);
+        getBtn = (Button) v1.findViewById(R.id.http_get_btn);
+        button_2327 = (Button) v1.findViewById(R.id.stock_2327_b);
+        button_2492 = (Button) v1.findViewById(R.id.stock_2492_b);
+        button_3406 = (Button) v1.findViewById(R.id.stock_3406_b);
+        button_6552 = (Button) v1.findViewById(R.id.stock_6552_b);
+
+
 
 
         //讓多個Button共用一個Listener，在Listener中再去設定各按鈕要做的事
-        getBtn.setOnClickListener(this);
-        button_2327.setOnClickListener(this);
-        button_2492.setOnClickListener(this);
-        button_3406.setOnClickListener(this);
-        button_6552.setOnClickListener(this);
+        getBtn.setOnClickListener(btn1Listener);
+        button_2327.setOnClickListener(btn1Listener);
+        button_2492.setOnClickListener(btn1Listener);
+        button_3406.setOnClickListener(btn1Listener);
+        button_6552.setOnClickListener(btn1Listener);
 
 
 
@@ -117,8 +136,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     case R.integer.sentToMain:
                         String ss = (String)msg.obj;
                         String[] tokens = ss.split(" ");
-                        String[] time = tokens[0].split(":");
-                        timeArr.add((Double.valueOf(time[0])*60*60+Double.valueOf(time[1])*60+Double.valueOf(time[2]))/ (24*60*60)*1000);
+                        //String[] time = tokens[0].split(":");
+                        //timeArr.add((Double.valueOf(time[0])*60*60+Double.valueOf(time[1])*60+Double.valueOf(time[2]))/ (24*60*60)*1000);
                         priceArr.add(Double.valueOf(tokens[1]));
                         //Log.i("123",String.valueOf(timeArr.get(0)));
                         //Log.i("123",String.valueOf(priceArr.size()));
@@ -192,67 +211,100 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
 
                         break;
+                    case R.integer.receiveBig:
+                        String ss_big = (String)msg.obj;
+                        //Log.i("123",ss_big);
+                        String[ ] ss_big_arr = ss_big.split(" ");
+                        String[] big_time = ss_big_arr[0].split(":");
+                        timeArr.add((Double.valueOf(big_time[0])*60*60+Double.valueOf(big_time[1])*60+Double.valueOf(big_time[2]))/ (24*60*60)*1000);
+                        bigDealArr.add(Double.valueOf(ss_big_arr[1]));
+                        if(Integer.valueOf(ss_big_arr[2])==1) {
+                            LinearLayout chartContainer = (LinearLayout) v2.findViewById(R.id.chart_container_big);
+                            chartContainer.removeAllViews();
+                            chartContainer.addView(ChartView(MainActivity.this, "Hello", "Count", timeArr, bigDealArr));
+                        }
+                        //Log.i("123",ss_big);
+                        break;
+                    case R.integer.receiveSmall:
+                        String ss_small = (String)msg.obj;
+                        String[ ] ss_small_arr = ss_small.split(" ");
+                        String[] small_time = ss_small_arr[0].split(":");
+                        //timeArr.add((Double.valueOf(small_time[0])*60*60+Double.valueOf(small_time[1])*60+Double.valueOf(small_time[2]))/ (24*60*60)*1000);
+                        smallDealArr.add(Double.valueOf(ss_small_arr[1]));
+                        if(Integer.valueOf(ss_small_arr[2])==1) {
+                            LinearLayout chartContainer = (LinearLayout) v2.findViewById(R.id.chart_container_small);
+                            chartContainer.removeAllViews();
+                            chartContainer.addView(ChartView(MainActivity.this, "Hello", "Count", timeArr, smallDealArr));
+                        }
+                        break;
                 }
             }
         };
     }
+    private Button.OnClickListener btn1Listener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.http_get_btn:
+                    //setNotification();
+                    //while(true) {
+                    //setNotification(String.valueOf("123"), -1);
+                    for (int i = 0; i < 10000; i++) {
 
+                        final int test_index;
+                        test_index = i;
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                TextView textViewSell = findViewById(R.id.showTextSell);
+                                textViewSell.setText("");
+                                TextView textViewBuy = findViewById(R.id.showTextBuy);
+                                textViewBuy.setText("");
+                                TextView textViewUpDown = findViewById(R.id.text_view_show_up_down);
+                                textViewUpDown.setText("");
+                                TextView textViewDeal = findViewById(R.id.showTextDeal);
+                                textViewDeal.setText("");
+                                timeArr = new ArrayList<>();
+                                priceArr = new ArrayList<>();
+                                bigDealArr = new ArrayList<>();
+                                smallDealArr = new ArrayList<>();
+                                EditText editTextStockNumber = findViewById(R.id.stock_number);
+                                String targetURL = getUrl.concat(editTextStockNumber.getText().toString() + ".html");
+                                EditText editTextRecentNumber = findViewById(R.id.big_number_edit);
+                                //getUrl=getUrl.concat(editTextStockNumber.getText().toString()+".html");
+                                //HG.Get(targetURL,Integer.valueOf(editTextRecentNumber.getText().toString()),Integer.valueOf(test_index));
+                                HG.Get(targetURL, Integer.valueOf(editTextRecentNumber.getText().toString()), test_index);
+                            }
+                        }, 10000 * i);
+                    }
+                    break;
+                case R.id.stock_2327_b:
+                    EditText editTextStockNumber_2327 = findViewById(R.id.stock_number);
+                    editTextStockNumber_2327.setText(String.valueOf(2327));
+                    //Log.i("123","123");
+                    break;
+                case R.id.stock_2492_b:
+                    EditText editTextStockNumber_2492 = findViewById(R.id.stock_number);
+                    editTextStockNumber_2492.setText(String.valueOf(2492));
+                    break;
+                case R.id.stock_3406_b:
+                    EditText editTextStockNumber_3406 = findViewById(R.id.stock_number);
+                    editTextStockNumber_3406.setText(String.valueOf(3406));
+                    break;
+                case R.id.stock_6552_b:
+                    EditText editTextStockNumber_6552 = findViewById(R.id.stock_number);
+                    editTextStockNumber_6552.setText(String.valueOf(6552));
+                    break;
+                default:
+                    break;
 
-    //依照按下的按鈕去做相對應的任務
-    public void onClick(View v){
-        switch (v.getId()){
-            case R.id.http_get_btn:
-                //setNotification();
-                //while(true) {
-                //setNotification(String.valueOf("123"), -1);
-                for(int i=0;i<10000;i++) {
-
-final int test_index;
-test_index=i;
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            TextView textViewSell = findViewById(R.id.showTextSell);
-                            textViewSell.setText("");
-                            TextView textViewBuy = findViewById(R.id.showTextBuy);
-                            textViewBuy.setText("");
-                            TextView textViewUpDown = findViewById(R.id.text_view_show_up_down);
-                            textViewUpDown.setText("");
-                            TextView textViewDeal = findViewById(R.id.showTextDeal);
-                            textViewDeal.setText("");
-                            timeArr = new ArrayList<>();
-                            priceArr = new ArrayList<>();
-                            EditText editTextStockNumber = findViewById(R.id.stock_number);
-                            String targetURL = getUrl.concat(editTextStockNumber.getText().toString() + ".html");
-                            EditText editTextRecentNumber = findViewById(R.id.big_number_edit);
-                            //getUrl=getUrl.concat(editTextStockNumber.getText().toString()+".html");
-                            //HG.Get(targetURL,Integer.valueOf(editTextRecentNumber.getText().toString()),Integer.valueOf(test_index));
-                            HG.Get(targetURL,Integer.valueOf(editTextRecentNumber.getText().toString()),test_index);
-                        }
-                    }, 10000*i);
-                }
-                break;
-            case R.id.stock_2327_b:
-                EditText editTextStockNumber_2327 = findViewById(R.id.stock_number);
-                editTextStockNumber_2327.setText(String.valueOf(2327));
-                //Log.i("123","123");
-                break;
-            case R.id.stock_2492_b:
-                EditText editTextStockNumber_2492 = findViewById(R.id.stock_number);
-                editTextStockNumber_2492.setText(String.valueOf(2492));
-                break;
-            case R.id.stock_3406_b:
-                EditText editTextStockNumber_3406 = findViewById(R.id.stock_number);
-                editTextStockNumber_3406.setText(String.valueOf(3406));
-                break;
-            case R.id.stock_6552_b:
-                EditText editTextStockNumber_6552 = findViewById(R.id.stock_number);
-                editTextStockNumber_6552.setText(String.valueOf(6552));
-                break;
-            default:
-                break;
+            }
         }
+    };
+
+
+    public void onClick(View v){
     }
 
 }

@@ -43,9 +43,9 @@ public class LineCharView {
         XYSeriesRenderer xySeriesRenderer = new XYSeriesRenderer();
         xySeriesRenderer.setColor(Color.RED);
         xySeriesRenderer.setChartValuesTextSize(40);// Value Text Size
-        xySeriesRenderer.setPointStyle(PointStyle.CIRCLE);
+        //xySeriesRenderer.setPointStyle(PointStyle.CIRCLE);
         xySeriesRenderer.setFillPoints(true);
-        xySeriesRenderer.setLineWidth(5);
+        xySeriesRenderer.setLineWidth(2);
         xySeriesRenderer.setDisplayChartValues(false);
 
         XYMultipleSeriesRenderer multiRenderer = new XYMultipleSeriesRenderer();
