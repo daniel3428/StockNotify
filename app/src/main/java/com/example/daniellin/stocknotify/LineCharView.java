@@ -52,8 +52,8 @@ public class LineCharView {
         multiRenderer.setXLabels(0);
         multiRenderer.setChartTitle(chartTitle);
         multiRenderer.setChartTitleTextSize(40);
-        multiRenderer.setXTitle("Date");// X Title
-        multiRenderer.setYTitle("Count");// Y Title
+        //multiRenderer.setXTitle("Date");// X Title
+        //multiRenderer.setYTitle("Count");// Y Title
         multiRenderer.setLabelsTextSize(40);// Label Text Size
         multiRenderer.setAxisTitleTextSize(40);// Axis Title Text Size
         multiRenderer.setZoomButtonsVisible(true);// Zoom?
