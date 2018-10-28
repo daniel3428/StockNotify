@@ -358,12 +358,13 @@ public class Http_Get extends Service {
                 this.totalSmallNumArr.add(totalSmallBuyNum-totalSmallSellNum);
             }
             if(i==0) {
-                sentToMainActivity(R.integer.receiveBig, this.preTimestampTemp.get(i).toString() + " " + this.totalBigNumArr.get(this.preTimestampTemp.size() - i - 1).toString()+" 1");
-                sentToMainActivity(R.integer.receiveSmall, this.preTimestampTemp.get(i).toString() + " " + this.totalSmallNumArr.get(this.preTimestampTemp.size() - i - 1).toString()+" 1");
+                sentToMainActivity(R.integer.receiveBig, this.preTimestampTemp.get(i).toString() + " " + this.totalBigNumArr.get(this.preTimestampTemp.size() - i - 1).toString()+" 1 "+this.dealQuantityArr.get(i));
+                sentToMainActivity(R.integer.receiveSmall, this.preTimestampTemp.get(i).toString() + " " + this.totalSmallNumArr.get(this.preTimestampTemp.size() - i - 1).toString()+" 1 "+this.dealQuantityArr.get(i));
             }
             else {
-                sentToMainActivity(R.integer.receiveBig, this.preTimestampTemp.get(i).toString() + " " + this.totalBigNumArr.get(this.preTimestampTemp.size() - i - 1).toString()+" 0");
-                sentToMainActivity(R.integer.receiveSmall, this.preTimestampTemp.get(i).toString() + " " + this.totalSmallNumArr.get(this.preTimestampTemp.size() - i - 1).toString()+" 0");
+                sentToMainActivity(R.integer.receiveBig, this.preTimestampTemp.get(i).toString() + " " + this.totalBigNumArr.get(this.preTimestampTemp.size() - i - 1).toString()+" 0 "+this.dealQuantityArr.get(i));
+                sentToMainActivity(R.integer.receiveSmall, this.preTimestampTemp.get(i).toString() + " " + this.totalSmallNumArr.get(this.preTimestampTemp.size() - i - 1).toString()+" 0 "+this.dealQuantityArr.get(i));
+                //Log.i("123",String.valueOf(this.dealQuantityArr.get(i)));
             }
         }
         Collections.reverse(this.totalBigNumArr);

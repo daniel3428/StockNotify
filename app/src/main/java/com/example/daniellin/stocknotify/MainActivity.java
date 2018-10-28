@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<Double> priceArr;
     private List<Double> bigDealArr;
     private List<Double> smallDealArr;
+    private List<Double> dealQuantity;
     private View v2;
 
     Http_Get HG;
@@ -218,10 +219,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         String[] big_time = ss_big_arr[0].split(":");
                         timeArr.add((Double.valueOf(big_time[0])*60*60+Double.valueOf(big_time[1])*60+Double.valueOf(big_time[2]))/ (24*60*60)*1000);
                         bigDealArr.add(Double.valueOf(ss_big_arr[1]));
+                        dealQuantity.add(Double.valueOf(ss_big_arr[3]));
                         if(Integer.valueOf(ss_big_arr[2])==1) {
-                            LinearLayout chartContainer = (LinearLayout) v2.findViewById(R.id.chart_container_big);
-                            chartContainer.removeAllViews();
-                            chartContainer.addView(ChartView(MainActivity.this, "Hello", "Count", timeArr, bigDealArr));
+                            LinearLayout chartContainer_1 = (LinearLayout) v2.findViewById(R.id.chart_container_big);
+                            chartContainer_1.removeAllViews();
+                            chartContainer_1.addView(ChartView(MainActivity.this, "Hello", "Count", timeArr, bigDealArr));
+                            LinearLayout chartContainer_2 = (LinearLayout) v2.findViewById(R.id.chart_container_deal_quantity);
+                            chartContainer_2.removeAllViews();
+                            chartContainer_2.addView(ChartView(MainActivity.this, "Hello", "Count", timeArr, dealQuantity));
                         }
                         //Log.i("123",ss_big);
                         break;
@@ -269,6 +274,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 priceArr = new ArrayList<>();
                                 bigDealArr = new ArrayList<>();
                                 smallDealArr = new ArrayList<>();
+                                dealQuantity = new ArrayList<>();
                                 EditText editTextStockNumber = findViewById(R.id.stock_number);
                                 String targetURL = getUrl.concat(editTextStockNumber.getText().toString() + ".html");
                                 EditText editTextRecentNumber = findViewById(R.id.big_number_edit);

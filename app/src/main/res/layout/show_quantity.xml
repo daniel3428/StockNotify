@@ -14,6 +14,13 @@
             android:layout_margin="8dip" >
         </LinearLayout>
         <LinearLayout
+            android:id="@+id/chart_container_deal_quantity"
+            android:layout_width="match_parent"
+            android:layout_height="180dip"
+            android:orientation="vertical"
+            android:layout_margin="8dip" >
+        </LinearLayout>
+        <LinearLayout
             android:id="@+id/chart_container_small"
             android:layout_width="match_parent"
             android:layout_height="180dip"
